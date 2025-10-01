@@ -33,6 +33,14 @@ type MapTile = {
     directions: Direction[];
 }
 
+// Hilfstabelle für alternative Richtungen bei Kurven
+const directionPriority: Record<Direction, Direction[]> = {
+    [Direction.NORTH]: [Direction.NORTH, Direction.EAST, Direction.WEST],
+    [Direction.EAST]:  [Direction.EAST, Direction.SOUTH, Direction.NORTH],
+    [Direction.SOUTH]: [Direction.SOUTH, Direction.WEST, Direction.EAST],
+    [Direction.WEST]:  [Direction.WEST, Direction.NORTH, Direction.SOUTH],
+};
+
 // Map Blueprint
 const map: MapTile[][] = [
     [{id: "\u2554", directions: [Direction.EAST, Direction.SOUTH],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2566", directions: [Direction.EAST, Direction.SOUTH, Direction.WEST],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2557", directions: [Direction.SOUTH, Direction.WEST],}],
@@ -74,197 +82,35 @@ function carMovement() {
         car2.speed = car2.speed - speedCorrection;
     }
     if (car1.speed > 0.5) {
-        switch (car1.direction) {
-            case Direction.NORTH:
-                northCar1();
-                break;
-            case Direction.EAST:
-                eastCar1();
-                break;
-            case Direction.SOUTH:
-                southCar1();
-                break;
-            case Direction.WEST:
-                westCar1();
-                break;
-        }
+        moveCar(car1);
     }
     if (car2.speed > 0.5){
-        switch(car2.direction){
-            case Direction.NORTH:
-                northCar2();
-                break;
-            case Direction.EAST:
-                eastCar2();
-                break;
-            case Direction.SOUTH:
-                southCar2();
-                break;
-            case Direction.WEST:
-                westCar2();
-                break;
-        }
+        moveCar(car2);
     }
 }
+
 //bestimmt in welche Richtung car geht
-function northCar1(){
-    let x = car1.position[0];
-    let y = car1.position[1];
-    let tile = map[y][x];
-    if (tile.directions.find(dir      => dir === Direction.NORTH) !== undefined) {
-        car1.position[1] -= 1;
-    }
-    else if (tile.directions.find(dir => dir ===Direction.EAST) !== undefined) {
-        car1.position[0] += 1;
-        car1.speed = car1.speed / 2;
-        car1.direction = Direction.EAST;
-    }
-    else if (tile.directions.find(dir => dir ===Direction.WEST) !== undefined) {
-        car1.position[0] -= 1;
-        car1.speed = car1.speed / 2;
-        car1.direction = Direction.WEST;
-    }
-}
-function eastCar1(){
-    let x = car1.position[0];
-    let y = car1.position[1];
-    let tile = map[y][x];
-    if (tile.directions.find(dir      => dir === Direction.EAST) !== undefined) {
-        car1.position[0] += 1;
-    }
-    else if (tile.directions.find(dir => dir ===Direction.SOUTH) !== undefined) {
-        car1.position[1] += 1;
-        car1.speed = car1.speed / 2;
-        car1.direction = Direction.SOUTH;
-    }
-    else if (tile.directions.find(dir => dir === Direction.NORTH) !== undefined)
-    {
-        car1.position[1] -= 1;
-        car1.speed = car1.speed / 2;
-        car1.direction = Direction.NORTH;
-    }
-}
-function southCar1(){
-
-    let x = car1.position[0];
-    let y = car1.position[1];
-    let tile = map[y][x];
-    if (tile.directions.find(dir => dir === Direction.SOUTH) !== undefined)
-    {
-        car1.position[1] += 1;
-    }
-    else if (tile.directions.find(dir => dir === Direction.WEST) !== undefined)
-    {
-        car1.position[0] -= 1;
-        car1.speed = car1.speed / 2;
-        car1.direction = Direction.WEST;
-    }
-    else if (tile.directions.find(dir => dir === Direction.EAST) !== undefined)
-    {
-        car1.position[0] += 1;
-        car1.speed = car1.speed / 2;
-        car1.direction = Direction.EAST;
-    }
-}
-function westCar1(){
-
-    let x = car1.position[0];
-    let y = car1.position[1];
-    let tile = map[y][x];
-    if (tile.directions.find(dir => dir === Direction.WEST) !== undefined)
-    {
-        car1.position[0] -= 1;
-    }
-    else if (tile.directions.find(dir => dir === Direction.NORTH) !== undefined)
-    {
-        car1.position[1] -= 1;
-        car1.speed = car1.speed / 2;
-        car1.direction = Direction.NORTH;
-    }
-    else if (tile.directions.find(dir => dir === Direction.SOUTH) !== undefined)
-    {
-        car1.position[1] += 1;
-        car1.speed = car1.speed / 2;
-        car1.direction = Direction.SOUTH;
-    }
-}
-function northCar2(){
-    let x = car2.position[0];
-    let y = car2.position[1];
-    let tile = map[y][x];
-    if (tile.directions.find(dir => dir === Direction.NORTH) !== undefined)
-    {
-        car2.position[1] -= 1;
-    }
-    else if (tile.directions.find(dir => dir === Direction.EAST) !== undefined)
-    {
-        car2.position[0] += 1;
-        car2.speed = car2.speed / 2;
-        car2.direction = Direction.EAST;
-    }
-    else if (tile.directions.find(dir => dir === Direction.WEST) !== undefined)
-    {
-        car2.position[0] -= 1;
-        car2.speed = car2.speed / 2;
-        car2.direction = Direction.WEST;
-    }
-}
-
-function eastCar2(){
-    let x = car2.position[0];
-    let y = car2.position[1];
-    let tile = map[y][x];
-    if (tile.directions.find(dir => dir === Direction.EAST) !== undefined) {
-        car2.position[0] += 1;
-    }
-    else if (tile.directions.find(dir => dir === Direction.SOUTH) !== undefined) {
-        car2.position[1] += 1;
-        car2.speed = car2.speed / 2;
-        car2.direction = Direction.SOUTH;
-    }
-    else if (tile.directions.find(dir => dir === Direction.NORTH) !== undefined) {
-        car2.position[1] -= 1;
-        car2.speed = car2.speed / 2;
-        car2.direction = Direction.NORTH;
-    }
-}
-
-function southCar2(){
-    let x = car2.position[0];
-    let y = car2.position[1];
-    let tile = map[y][x];
-    if (tile.directions.find(dir => dir === Direction.SOUTH) !== undefined)
-    {
-        car2.position[1] += 1;
-    }
-    else if (tile.directions.find(dir => dir === Direction.WEST) !== undefined)
-    {
-        car2.position[0] -= 1;
-        car2.speed = car2.speed / 2;
-        car2.direction = Direction.WEST;
-    }
-    else if (tile.directions.find(dir => dir === Direction.EAST) !== undefined)
-    {
-        car2.position[0] += 1;
-        car2.speed = car2.speed / 2;
-        car2.direction = Direction.EAST;
-    }
-}
-function westCar2() {
-
-    let x = car2.position[0];
-    let y = car2.position[1];
-    let tile = map[y][x];
-    if (tile.directions.find(dir => dir === Direction.WEST) !== undefined) {
-        car2.position[0] -= 1;
-    } else if (tile.directions.find(dir => dir === Direction.NORTH) !== undefined) {
-        car2.position[1] -= 1;
-        car2.speed = car2.speed / 2;
-        car2.direction = Direction.NORTH;
-    } else if (tile.directions.find(dir => dir === Direction.SOUTH) !== undefined) {
-        car2.position[1] += 1;
-        car2.speed = car2.speed / 2;
-        car2.direction = Direction.SOUTH;
+function moveCar(car: Car) {
+    const [x, y] = car.position;
+    const currentTile = map[y][x];// MapTile, auf dem das Auto steht
+    // Erste gültige Richtung anhand der Priorität suchen
+    const nextDirection = directionPriority[car.direction]
+        .find(dir => currentTile.directions.includes(dir));
+    if (nextDirection) { // Falls eine gültige Richtung existiert
+        if (nextDirection === Direction.NORTH) {// in Richtung bewegen
+            car.position[1] -= 1;
+        } else if (nextDirection === Direction.SOUTH) {
+            car.position[1] += 1;
+        } else if (nextDirection === Direction.EAST) {
+            car.position[0] += 1;
+        } else if (nextDirection === Direction.WEST) {
+            car.position[0] -= 1;
+        }
+        // Falls abbiegen: Bremsen + Richtung ändern
+        if (nextDirection !== car.direction) {
+            car.speed /= 2;
+            car.direction = nextDirection;
+        }
     }
 }
 
