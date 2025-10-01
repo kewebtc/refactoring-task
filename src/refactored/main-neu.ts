@@ -46,6 +46,7 @@ const map: MapTile[][] = [
     [{id: "\u2554", directions: [Direction.EAST, Direction.SOUTH],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2566", directions: [Direction.EAST, Direction.SOUTH, Direction.WEST],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2557", directions: [Direction.SOUTH, Direction.WEST],}],
     [{id: "\u2551", directions: [Direction.NORTH, Direction.SOUTH],}, {id: " ", directions: [],}, {id: " ", directions: [],}, {id: "\u255A", directions: [Direction.NORTH, Direction.EAST],}, {id: "\u2566", directions: [Direction.EAST, Direction.SOUTH, Direction.WEST],}, {id: "\u255D", directions: [Direction.NORTH, Direction.WEST],}],
     [{id: "\u255A", directions: [Direction.NORTH, Direction.EAST],}, {id: "\u2550", directions: [Direction.EAST, Direction.WEST],}, {id: "\u2550", directions: [Direction.EAST, Direction.WEST],}, {id: "\u256B", directions: [Direction.EAST, Direction.WEST],}, {id: "\u255D", directions: [Direction.NORTH, Direction.WEST],}, {id: " ", directions: [],}],]
+
 //functions
 function directionCompass(direction:Direction):string{
     switch(direction){
@@ -60,32 +61,19 @@ function directionCompass(direction:Direction):string{
         default: return "error"
     }
 }
+
 function carMovement() {
-    if (car1.speed < 0.9){
-        car1.speed = car1.speed + 0.2;
-    }
-    if (car1.speed < 0.10 && car1.speed > 0.8 ){
-        car1.speed = car1.speed + 0.1;
-    }
-    if (car2.speed < 0.9){
-        car2.speed = car2.speed + 0.2;
-    }
-    if (car2.speed < 0.10 && car2.speed > 0.8 ){
-        car2.speed = car2.speed + 0.1;
-    }
-    if (car1.speed > 1){
-        speedCorrection = car1.speed - 1;
-        car1.speed = car1.speed - speedCorrection;
-    }
-    if (car2.speed > 1){
-        speedCorrection = car2.speed - 1;
-        car2.speed = car2.speed - speedCorrection;
-    }
-    if (car1.speed > 0.5) {
-        moveCar(car1);
-    }
-    if (car2.speed > 0.5){
-        moveCar(car2);
+    const cars: Car[] = [car1, car2];
+    for (const car of cars) {
+        car.speed += 0.2;
+        // Maximalgeschwindigkeit korrigieren
+        if (car.speed > 1) {
+            car.speed = 1;
+        }
+        // Bewegung wenn schnell genug
+        if (car.speed > 0.5) {
+            moveCar(car);
+        }
     }
 }
 
