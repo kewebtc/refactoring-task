@@ -10,80 +10,72 @@ interface Point{
     y:number;
 }
 
-type Car = {
-    ascii: string;
-    position: Point;
-    speed: number;
-    direction: Direction;
+class Car  {
+
+    public static directionPriority: Record<Direction,Direction[]> = {
+        [Direction.NORTH]: [Direction.NORTH, Direction.EAST, Direction.WEST],
+        [Direction.EAST]:  [Direction.EAST, Direction.SOUTH, Direction.NORTH],
+        [Direction.SOUTH]: [Direction.SOUTH, Direction.WEST, Direction.EAST],
+        [Direction.WEST]:  [Direction.WEST, Direction.NORTH, Direction.SOUTH],
+    };
+
+    public ascii: string;
+    public position: Point;
+    public speed: number;
+    public direction: Direction;
+
+    constructor(ascii: string, position: Point, direction: Direction) {
+        this.ascii = ascii;
+        this.position = position;
+        this.speed = 0;
+        this.direction = direction;
+    }
+
+    public move(map:MapTile[][]):void{
+        this.speed += 0.2;
+        if (this.speed > 1) {
+            this.speed = 1;
+        }
+        if (this.speed > 0.5) {
+            const currentTile = map[this.position.y][this.position.x];
+            const nextDirection = Car.directionPriority[this.direction]
+                .find(dir => currentTile.directions.includes(dir));
+            // Falls gültige Richtung existiert
+            if (nextDirection) {
+                if (nextDirection === Direction.NORTH) {
+                    this.position.y -= 1;
+                } else if (nextDirection === Direction.SOUTH) {
+                    this.position.y += 1;
+                } else if (nextDirection === Direction.EAST) {
+                    this.position.x += 1;
+                } else if (nextDirection === Direction.WEST) {
+                    this.position.x -= 1;
+                }
+                // Falls abbiegen: Bremsen + Richtung ändern
+                if (nextDirection !== this.direction) {
+                    this.speed /= 2;
+                    this.direction = nextDirection;
+                }
+            }
+        }
+
+    }
 }
 
-const car1: Car = {
-    ascii: "B",
-    position: {x:3,y:2},
-    speed: 0,
-    direction: Direction.EAST
-}
-
-const car2: Car = {
-    ascii: "R",
-    position: {x:3,y:2},
-    speed: 0,
-    direction: Direction.WEST
-}
+const car1: Car = new Car("B",{x:3,y:2},Direction.EAST);
+const car2: Car = new Car("R",{x:3,y:2},Direction.WEST);
 
 type MapTile = {
     id: string;
     directions: Direction[];
 }
-// Hilfstabelle für alternative Richtungen bei Kurven
-const directionPriority: Record<Direction, Direction[]> = {
-    [Direction.NORTH]: [Direction.NORTH, Direction.EAST, Direction.WEST],
-    [Direction.EAST]:  [Direction.EAST, Direction.SOUTH, Direction.NORTH],
-    [Direction.SOUTH]: [Direction.SOUTH, Direction.WEST, Direction.EAST],
-    [Direction.WEST]:  [Direction.WEST, Direction.NORTH, Direction.SOUTH],
-};
+
 // Map Blueprint
 const map: MapTile[][] = [
     [{id: "\u2554", directions: [Direction.EAST, Direction.SOUTH],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2566", directions: [Direction.EAST, Direction.SOUTH, Direction.WEST],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2557", directions: [Direction.SOUTH, Direction.WEST],}],
     [{id: "\u2551", directions: [Direction.NORTH, Direction.SOUTH],}, {id: " ", directions: [],}, {id: " ", directions: [],}, {id: "\u255A", directions: [Direction.NORTH, Direction.EAST],}, {id: "\u2566", directions: [Direction.EAST, Direction.SOUTH, Direction.WEST],}, {id: "\u255D", directions: [Direction.NORTH, Direction.WEST],}],
     [{id: "\u255A", directions: [Direction.NORTH, Direction.EAST],}, {id: "\u2550", directions: [Direction.EAST, Direction.WEST],}, {id: "\u2550", directions: [Direction.EAST, Direction.WEST],}, {id: "\u256B", directions: [Direction.EAST, Direction.WEST],}, {id: "\u255D", directions: [Direction.NORTH, Direction.WEST],}, {id: " ", directions: [],}],]
-function carMovement(cars:Car[]) {
-    for (const car of cars) {
-        car.speed += 0.2;
-        // Maximalgeschwindigkeit korrigieren
-        if (car.speed > 1) {
-            car.speed = 1;
-        }
-        // Bewegung wenn schnell genug
-        if (car.speed > 0.5) {
-            moveCar(car);
-        }
-    }
-}
 
-//bestimmt in welche Richtung car geht
-function moveCar(car: Car) {
-    const currentTile = map[car.position.y][car.position.x];// MapTile, auf dem das Auto steht
-    // Erste gültige Richtung anhand der Priorität suchen
-    const nextDirection = directionPriority[car.direction]
-        .find(dir => currentTile.directions.includes(dir));
-    if (nextDirection) { // Falls eine gültige Richtung existiert
-        if (nextDirection === Direction.NORTH) {// in Richtung bewegen
-            car.position.y -= 1;
-        } else if (nextDirection === Direction.SOUTH) {
-            car.position.y += 1;
-        } else if (nextDirection === Direction.EAST) {
-            car.position.x += 1;
-        } else if (nextDirection === Direction.WEST) {
-            car.position.x -= 1;
-        }
-        // Falls abbiegen: Bremsen + Richtung ändern
-        if (nextDirection !== car.direction) {
-            car.speed /= 2;
-            car.direction = nextDirection;
-        }
-    }
-}
 
 //Iterationen:
 runCode();
@@ -94,7 +86,8 @@ iterationCounter++;
 console.log("__________________________________________________________________________________________________Page " + iterationCounter)
 function runCode() {
     while (!carsCrashed) {
-        carMovement([car1, car2]);
+        car1.move(map);
+        car2.move(map);
         iterationCounter++;
         if (iterationCounter > 2) {
             if (car1.position.y === car2.position.y &&
