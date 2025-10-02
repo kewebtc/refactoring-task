@@ -2,10 +2,14 @@ enum Direction{
     NORTH="NORTH",EAST="EAST", SOUTH="SOUTH", WEST="WEST"
 }
 
-
 interface Point{
     x:number;
     y:number;
+}
+
+type MapTile = {
+    id: string;
+    directions: Direction[];
 }
 
 class Car  {
@@ -57,47 +61,49 @@ class Car  {
     }
 }
 
-type MapTile = {
-    id: string;
-    directions: Direction[];
-}
-
 class Simulation {
     public iterationCounter: number;
+    public map:MapTile[][];
+    public carOne: Car;
+    public carTwo: Car;
 
-    constructor() {
+    constructor(map:MapTile[][], carOne: Car, carTwo: Car) {
         this.iterationCounter = 0;
+        this.map = map;
+        this.carOne = carOne;
+        this.carTwo = carTwo;
     }
 
-    run(map:MapTile[][], carOne:Car,carTwo:Car) {
+    run() {
         let carsCrashed: boolean = false;
         while (!carsCrashed) {
-            carOne.move(map);
-            carTwo.move(map);
+            this.carOne.move(this.map);
+            this.carTwo.move(this.map);
             this.iterationCounter++;
             if (this.iterationCounter > 2) {
-                if (carOne.position.y === carTwo.position.y &&
-                    carOne.position.x === carTwo.position.x) {
+                if (this.carOne.position.y === this.carTwo.position.y &&
+                    this.carOne.position.x === this.carTwo.position.x) {
                     carsCrashed = true;
                     console.log("OH NO A CAR CRASH")
                 }
             }
             //Map generating
-            for (let y = 0; y < map.length; y++) {
+            for (let y = 0; y < this.map.length; y++) {
                 let row = '';
-                for (let x = 0; x < map[y].length; x++) {
-                    if (x === carOne.position.x && y === carOne.position.y) {
-                        row += carOne.ascii;
-                    } else if (x === carTwo.position.x && y === carTwo.position.y) {
-                        row += carTwo.ascii;
+                for (let x = 0; x < this.map[y].length; x++) {
+                    if (x === this.carOne.position.x && y === this.carOne.position.y) {
+                        row += this.carOne.ascii;
+                    } else if (x === this.carTwo.position.x && y === this.carTwo.position.y) {
+                        row += this.carTwo.ascii;
                     } else
-                        row += map[y][x].id;
+                        row += this.map[y][x].id;
                 }
                 console.log(row.trim());
             }
-            console.log("car1 (B) position: " + carOne.position, "| car2 (R) position: " + carTwo.position);
-            console.log("car1 (B)speed: " + carOne.speed, "| car2 (R) speed: " + carTwo.speed);
-            console.log("car1 (B)direction: " + carOne.direction.toLowerCase(), "| car2 (R) direction: " + carTwo.direction.toLowerCase());
+            console.log("car1 (B) position: " + this.carOne.position, "| car2 (R) position: " + this.carTwo.position);
+            console.log("car1 (B)speed: " + this.carOne.speed, "| car2 (R) speed: " + this.carTwo.speed);
+            console.log("car1 (B)direction: " + this.carOne.direction.toLowerCase(), "| car2 (R) direction: " +
+                this.carTwo.direction.toLowerCase());
             console.log("_".repeat(50) + "Page " + this.iterationCounter);
         }
         console.log("    █████████████████████████████████");
@@ -115,18 +121,19 @@ class Game{
     private simulation:Simulation;
 
     constructor(){
-        //Initialisierung aller Objekte
-        this.carOne= new Car("B",{x:3,y:2},Direction.EAST);
-        this.carTwo = new Car("R",{x:3,y:2},Direction.WEST);
-        this.simulation = new Simulation();
+        //Initialisierung aller SpielObjekte
         this.map = [
             [{id: "\u2554", directions: [Direction.EAST, Direction.SOUTH],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2566", directions: [Direction.EAST, Direction.SOUTH, Direction.WEST],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2557", directions: [Direction.SOUTH, Direction.WEST],}],
             [{id: "\u2551", directions: [Direction.NORTH, Direction.SOUTH],}, {id: " ", directions: [],}, {id: " ", directions: [],}, {id: "\u255A", directions: [Direction.NORTH, Direction.EAST],}, {id: "\u2566", directions: [Direction.EAST, Direction.SOUTH, Direction.WEST],}, {id: "\u255D", directions: [Direction.NORTH, Direction.WEST],}],
             [{id: "\u255A", directions: [Direction.NORTH, Direction.EAST],}, {id: "\u2550", directions: [Direction.EAST, Direction.WEST],}, {id: "\u2550", directions: [Direction.EAST, Direction.WEST],}, {id: "\u256B", directions: [Direction.EAST, Direction.WEST],}, {id: "\u255D", directions: [Direction.NORTH, Direction.WEST],}, {id: " ", directions: [],}],]
+        this.carOne= new Car("B",{x:3,y:2},Direction.EAST);
+        this.carTwo = new Car("R",{x:3,y:2},Direction.WEST);
+        // Initialisierung der verwaltenden Objekte
+        this.simulation = new Simulation(this.map, this.carOne, this.carTwo);
     }
 
     public startGame(){
-        this.simulation.run(this.map, this.carOne,this.carTwo);
+        this.simulation.run();
     }
 }
 
