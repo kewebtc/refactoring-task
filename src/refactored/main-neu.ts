@@ -1,38 +1,40 @@
 let iterationCounter: number = 0;
 let carsCrashed:boolean = false;
-let speedCorrection: number = 0;
 
 enum Direction{
     NORTH="NORTH",EAST="EAST", SOUTH="SOUTH", WEST="WEST"
 }
 
+interface Point{
+    x:number;
+    y:number;
+}
+
 type Car = {
     ascii: string;
-    position: number[];
+    position: Point;
     speed: number;
-    tilesMoved: number;
     direction: Direction;
 }
-let car1: Car = {
+
+const car1: Car = {
     ascii: "B",
-    position: [3, 2],
+    position: {x:3,y:2},
     speed: 0,
-    tilesMoved: 0,
-    direction: Direction.EAST,
+    direction: Direction.EAST
 }
-let car2: Car = {
+
+const car2: Car = {
     ascii: "R",
-    position: [3, 2],
+    position: {x:3,y:2},
     speed: 0,
-    tilesMoved: 0,
-    direction: Direction.WEST,
+    direction: Direction.WEST
 }
 
 type MapTile = {
     id: string;
     directions: Direction[];
 }
-
 // Hilfstabelle für alternative Richtungen bei Kurven
 const directionPriority: Record<Direction, Direction[]> = {
     [Direction.NORTH]: [Direction.NORTH, Direction.EAST, Direction.WEST],
@@ -40,30 +42,12 @@ const directionPriority: Record<Direction, Direction[]> = {
     [Direction.SOUTH]: [Direction.SOUTH, Direction.WEST, Direction.EAST],
     [Direction.WEST]:  [Direction.WEST, Direction.NORTH, Direction.SOUTH],
 };
-
 // Map Blueprint
 const map: MapTile[][] = [
     [{id: "\u2554", directions: [Direction.EAST, Direction.SOUTH],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2566", directions: [Direction.EAST, Direction.SOUTH, Direction.WEST],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2557", directions: [Direction.SOUTH, Direction.WEST],}],
     [{id: "\u2551", directions: [Direction.NORTH, Direction.SOUTH],}, {id: " ", directions: [],}, {id: " ", directions: [],}, {id: "\u255A", directions: [Direction.NORTH, Direction.EAST],}, {id: "\u2566", directions: [Direction.EAST, Direction.SOUTH, Direction.WEST],}, {id: "\u255D", directions: [Direction.NORTH, Direction.WEST],}],
     [{id: "\u255A", directions: [Direction.NORTH, Direction.EAST],}, {id: "\u2550", directions: [Direction.EAST, Direction.WEST],}, {id: "\u2550", directions: [Direction.EAST, Direction.WEST],}, {id: "\u256B", directions: [Direction.EAST, Direction.WEST],}, {id: "\u255D", directions: [Direction.NORTH, Direction.WEST],}, {id: " ", directions: [],}],]
-
-//functions
-function directionCompass(direction:Direction):string{
-    switch(direction){
-        case Direction.NORTH:
-            return "north"
-        case Direction.EAST:
-            return "east"
-        case Direction.SOUTH:
-            return "south"
-        case Direction.WEST:
-            return "west"
-        default: return "error"
-    }
-}
-
-function carMovement() {
-    const cars: Car[] = [car1, car2];
+function carMovement(cars:Car[]) {
     for (const car of cars) {
         car.speed += 0.2;
         // Maximalgeschwindigkeit korrigieren
@@ -79,20 +63,19 @@ function carMovement() {
 
 //bestimmt in welche Richtung car geht
 function moveCar(car: Car) {
-    const [x, y] = car.position;
-    const currentTile = map[y][x];// MapTile, auf dem das Auto steht
+    const currentTile = map[car.position.y][car.position.x];// MapTile, auf dem das Auto steht
     // Erste gültige Richtung anhand der Priorität suchen
     const nextDirection = directionPriority[car.direction]
         .find(dir => currentTile.directions.includes(dir));
     if (nextDirection) { // Falls eine gültige Richtung existiert
         if (nextDirection === Direction.NORTH) {// in Richtung bewegen
-            car.position[1] -= 1;
+            car.position.y -= 1;
         } else if (nextDirection === Direction.SOUTH) {
-            car.position[1] += 1;
+            car.position.y += 1;
         } else if (nextDirection === Direction.EAST) {
-            car.position[0] += 1;
+            car.position.x += 1;
         } else if (nextDirection === Direction.WEST) {
-            car.position[0] -= 1;
+            car.position.x -= 1;
         }
         // Falls abbiegen: Bremsen + Richtung ändern
         if (nextDirection !== car.direction) {
@@ -111,14 +94,11 @@ iterationCounter++;
 console.log("__________________________________________________________________________________________________Page " + iterationCounter)
 function runCode() {
     while (!carsCrashed) {
-        carMovement();
+        carMovement([car1, car2]);
         iterationCounter++;
         if (iterationCounter > 2) {
-            let car1Y = car1.position[0];
-            let car1Z = car1.position[1];
-            let car2Y = car2.position[0];
-            let car2Z = car2.position[1];
-            if (car1Y === car2Y && car1Z === car2Z) {
+            if (car1.position.y === car2.position.y &&
+                car1.position.x === car2.position.x) {
                 carsCrashed = true;
                 console.log("OH NO A CAR CRASH")
             }
@@ -127,9 +107,9 @@ function runCode() {
         for (let y = 0; y < map.length; y++) {
             let row = '';
             for (let x = 0; x < map[y].length; x++) {
-                if (x === car1.position[0] && y === car1.position[1]) {
+                if (x === car1.position.x && y === car1.position.y) {
                     row += car1.ascii;
-                } else if (x === car2.position[0] && y === car2.position[1]) {
+                } else if (x === car2.position.x && y === car2.position.y) {
                     row += car2.ascii;
                 } else
                     row += map[y][x].id;
@@ -138,7 +118,7 @@ function runCode() {
         }
         console.log("car1 (B) position: " + car1.position, "| car2 (R) position: " + car2.position);
         console.log("car1 (B)speed: " + car1.speed, "| car2 (R) speed: " + car2.speed);
-        console.log("car1 (B)direction: " + directionCompass(car1.direction), "| car2 (R) direction: " + directionCompass(car2.direction));
+        console.log("car1 (B)direction: " + car1.direction.toLowerCase(), "| car2 (R) direction: " + car2.direction.toLowerCase());
         console.log("__________________________________________________________________________________________________Page " + iterationCounter);
     }
 }
