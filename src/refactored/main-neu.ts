@@ -1,10 +1,10 @@
-enum Direction{
-    NORTH="NORTH",EAST="EAST", SOUTH="SOUTH", WEST="WEST"
+enum Direction {
+    NORTH = "NORTH", EAST = "EAST", SOUTH = "SOUTH", WEST = "WEST"
 }
 
-interface Point{
-    x:number;
-    y:number;
+interface Point {
+    x: number;
+    y: number;
 }
 
 type MapTile = {
@@ -12,12 +12,12 @@ type MapTile = {
     directions: Direction[];
 }
 
-class Car  {
-    public static directionPriority: Record<Direction,Direction[]> = {
+class Car {
+    public static directionPriority: Record<Direction, Direction[]> = {
         [Direction.NORTH]: [Direction.NORTH, Direction.EAST, Direction.WEST],
-        [Direction.EAST]:  [Direction.EAST, Direction.SOUTH, Direction.NORTH],
+        [Direction.EAST]: [Direction.EAST, Direction.SOUTH, Direction.NORTH],
         [Direction.SOUTH]: [Direction.SOUTH, Direction.WEST, Direction.EAST],
-        [Direction.WEST]:  [Direction.WEST, Direction.NORTH, Direction.SOUTH],
+        [Direction.WEST]: [Direction.WEST, Direction.NORTH, Direction.SOUTH],
     };
     public symbol: string;
     public position: Point;
@@ -31,7 +31,7 @@ class Car  {
         this.direction = direction;
     }
 
-    public move(map:MapTile[][]):void{
+    public move(map: MapTile[][]): void {
         this.speed += 0.2;
         if (this.speed > 1) {
             this.speed = 1;
@@ -63,12 +63,12 @@ class Car  {
 
 class Simulation {
     public iterationCounter: number;
-    public streetMap:MapTile[][];
+    public streetMap: MapTile[][];
     public carOne: Car;
     public carTwo: Car;
-    public renderer:Renderer;
+    public renderer: Renderer;
 
-    constructor(map:MapTile[][], carOne: Car, carTwo: Car, renderer: Renderer) {
+    constructor(map: MapTile[][], carOne: Car, carTwo: Car, renderer: Renderer) {
         this.iterationCounter = 0;
         this.streetMap = map;
         this.carOne = carOne;
@@ -95,8 +95,8 @@ class Simulation {
     }
 }
 
-class Renderer{
-    public streetMap:MapTile[][];
+class Renderer {
+    public streetMap: MapTile[][];
     public carOne: Car;
     public carTwo: Car;
     private readonly separatorLength: number;
@@ -108,7 +108,7 @@ class Renderer{
         this.carTwo = carTwo;
     }
 
-    public render(iterationCounter:number){
+    public render(iterationCounter: number) {
         //Map generating
         for (let y = 0; y < this.streetMap.length; y++) {
             let row = '';
@@ -129,7 +129,7 @@ class Renderer{
         console.log("_".repeat(this.separatorLength) + "Page " + iterationCounter);
     }
 
-    public renderCrash(iterationCounter:number){
+    public renderCrash(iterationCounter: number) {
         console.log("OH NO A CAR CRASH")
         console.log("    █████████████████████████████████");
         console.log("    ████ B O O M ████████████████████");
@@ -138,31 +138,52 @@ class Renderer{
     }
 }
 
-class Game{
-    private readonly streetMap:MapTile[][];
+class Game {
+    private readonly streetMap: MapTile[][];
     private readonly carOne: Car;
     private readonly carTwo: Car;
 
     private readonly renderer: Renderer;
-    private simulation:Simulation;
+    private simulation: Simulation;
 
-    constructor(){
+    constructor() {
         //Initialisierung aller SpielObjekte
         this.streetMap = [
-            [{id: "\u2554", directions: [Direction.EAST, Direction.SOUTH],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2566", directions: [Direction.EAST, Direction.SOUTH, Direction.WEST],},{id: "\u2550", directions: [Direction.EAST, Direction.WEST],},{id: "\u2557", directions: [Direction.SOUTH, Direction.WEST],}],
-            [{id: "\u2551", directions: [Direction.NORTH, Direction.SOUTH],}, {id: " ", directions: [],}, {id: " ", directions: [],}, {id: "\u255A", directions: [Direction.NORTH, Direction.EAST],}, {id: "\u2566", directions: [Direction.EAST, Direction.SOUTH, Direction.WEST],}, {id: "\u255D", directions: [Direction.NORTH, Direction.WEST],}],
-            [{id: "\u255A", directions: [Direction.NORTH, Direction.EAST],}, {id: "\u2550", directions: [Direction.EAST, Direction.WEST],}, {id: "\u2550", directions: [Direction.EAST, Direction.WEST],}, {id: "\u256B", directions: [Direction.EAST, Direction.WEST],}, {id: "\u255D", directions: [Direction.NORTH, Direction.WEST],}, {id: " ", directions: [],}],]
-        this.carOne= new Car("B",{x:3,y:2},Direction.EAST);
-        this.carTwo = new Car("R",{x:3,y:2},Direction.WEST);
+            [{id: "\u2554", directions: [Direction.EAST, Direction.SOUTH],}, {
+                id: "\u2550",
+                directions: [Direction.EAST, Direction.WEST],
+            }, {id: "\u2550", directions: [Direction.EAST, Direction.WEST],}, {
+                id: "\u2566",
+                directions: [Direction.EAST, Direction.SOUTH, Direction.WEST],
+            }, {id: "\u2550", directions: [Direction.EAST, Direction.WEST],}, {
+                id: "\u2557",
+                directions: [Direction.SOUTH, Direction.WEST],
+            }],
+            [{id: "\u2551", directions: [Direction.NORTH, Direction.SOUTH],}, {id: " ", directions: [],}, {
+                id: " ",
+                directions: [],
+            }, {id: "\u255A", directions: [Direction.NORTH, Direction.EAST],}, {
+                id: "\u2566",
+                directions: [Direction.EAST, Direction.SOUTH, Direction.WEST],
+            }, {id: "\u255D", directions: [Direction.NORTH, Direction.WEST],}],
+            [{id: "\u255A", directions: [Direction.NORTH, Direction.EAST],}, {
+                id: "\u2550",
+                directions: [Direction.EAST, Direction.WEST],
+            }, {id: "\u2550", directions: [Direction.EAST, Direction.WEST],}, {
+                id: "\u256B",
+                directions: [Direction.EAST, Direction.WEST],
+            }, {id: "\u255D", directions: [Direction.NORTH, Direction.WEST],}, {id: " ", directions: [],}],]
+        this.carOne = new Car("B", {x: 3, y: 2}, Direction.EAST);
+        this.carTwo = new Car("R", {x: 3, y: 2}, Direction.WEST);
         // Initialisierung der verwaltenden Objekte
         this.renderer = new Renderer(this.streetMap, this.carOne, this.carTwo);
-        this.simulation = new Simulation(this.streetMap, this.carOne, this.carTwo,this.renderer);
+        this.simulation = new Simulation(this.streetMap, this.carOne, this.carTwo, this.renderer);
     }
 
-    public startGame(){
+    public startGame() {
         this.simulation.run();
     }
 }
 
-const game:Game = new Game();
+const game: Game = new Game();
 game.startGame();
