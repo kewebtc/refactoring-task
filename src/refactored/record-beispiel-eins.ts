@@ -1,18 +1,18 @@
-const schluesselEins:string = "Eins";
-const schluesselZwei:string = "Zwei";
-const schluesselDrei:string = "Drei";
+const keyOne:string = "Eins";
+const keyTwo:string = "Zwei";
+const keyThree:string = "Drei";
 
-const englischeZahlen: Record<string, string> = {
+const englishNumbers: Record<string, string> = {
     "Eins": "One",
     "Zwei": "Two",
     "Drei": "Three",
     "Vier": "Four",
 };
 
-const meinWertAusEnglischenZahlenEins: string = englischeZahlen[schluesselEins];
-const meinWertAusEnglischenZahlenZwei: string = englischeZahlen[schluesselZwei];
-const meinWertAusEnglischenZahlenDrei: string = englischeZahlen[schluesselDrei];
+const valOneFromEnglishNumbers: string = englishNumbers[keyOne];
+const valTwoFromEnglishNumbers: string = englishNumbers[keyTwo];
+const valThreeFromEnglishNumbers: string = englishNumbers[keyThree];
 
-console.log("Ausgabe: " + meinWertAusEnglischenZahlenEins);
-console.log("Ausgabe: " + meinWertAusEnglischenZahlenZwei);
-console.log("Ausgabe: " + meinWertAusEnglischenZahlenDrei);
+console.log("Ausgabe valOneFromEnglishNumbers: " + valOneFromEnglishNumbers);
+console.log("Ausgabe valTwoFromEnglishNumbers: " + valTwoFromEnglishNumbers);
+console.log(" valThreeFromEnglishNumbers: " + valThreeFromEnglishNumbers);
